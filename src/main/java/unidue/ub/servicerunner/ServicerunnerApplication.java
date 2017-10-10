@@ -1,12 +1,12 @@
-package unidue.ub.notationbuilder;
+package unidue.ub.servicerunner;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class NotationBuilderApplication {
+public class ServicerunnerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NotationBuilderApplication.class, args);
+		SpringApplication.run(ServicerunnerApplication.class, args);
 	}
 }
