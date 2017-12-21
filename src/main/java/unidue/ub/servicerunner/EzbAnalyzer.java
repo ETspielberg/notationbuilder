@@ -1,28 +1,31 @@
 package unidue.ub.servicerunner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unidue.ub.media.journals.Journal;
-import unidue.ub.media.journals.JournalCollection;
-import unidue.ub.media.journals.JournalTitle;
+import unidue.ub.media.journals.Journalcollection;
+import unidue.ub.media.journals.Journaltitle;
 
 import java.io.*;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class EzbUpload {
+class EzbAnalyzer {
 
     private String resourcesUrl;
 
     private String dataDir;
 
-    private ObjectMapper mapper = new ObjectMapper();
-
+    private Hashtable<String,Journalcollection> collections;
 
     private static final Pattern yearPattern = Pattern.compile("((19|20)\\d\\d)");
 
-    EzbUpload(String dataDir, String resourcesUrl) {
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+
+    EzbAnalyzer(String dataDir, String resourcesUrl) {
         this.dataDir = dataDir;
         this.resourcesUrl = resourcesUrl;
     }
@@ -34,22 +37,22 @@ class EzbUpload {
             year = Integer.parseInt(matcher.group());
         InputStream input = loadFile(filename);
         readCsv(input, year);
+        saveJournalCollections(collections);
     }
 
     private synchronized InputStream loadFile(String filename) throws FileNotFoundException {
-        File file = new File(dataDir, filename);
+        File file = new File(dataDir + "/ezbUpload", filename);
         return new FileInputStream(file);
     }
 
     private void readCsv(InputStream csvFile, int year) throws IOException {
         HashSet<String> issnsCollection = new HashSet<>();
         Scanner inputStream = new Scanner(new InputStreamReader(csvFile));
-        Hashtable<String, JournalCollection> collections = new Hashtable<>();
-        List<Journal> journals = new ArrayList<>();
-        List<JournalTitle> journalTitles = new ArrayList<>();
+        collections = new Hashtable<>();
         inputStream.nextLine();
 
         while (inputStream.hasNext()) {
+            List<Journaltitle> journalTitles = new ArrayList<>();
             // get the individual parts of the string
             String line = inputStream.nextLine();
             String[] parts = line.split("\t");
@@ -71,61 +74,43 @@ class EzbUpload {
             String name = parts[1];
             if (name.contains("="))
                 name = name.substring(0, name.indexOf("="));
-
-            Journal journal = new Journal();
-            journal.setZdbID(zdbID).setEzbID(parts[0]).setSubject(subject).setActualName(name).setLink(parts[12]);
-            if (!eIssns.isEmpty())
-                journal.addISSN(eIssns);
-            if (!pIssns.isEmpty())
-                journal.addISSN(pIssns);
-
-            journals.add(journal);
-            String anchor = "";
+            String type = "single";
+            String anchor;
             try {
                 anchor = parts[13];
+                type = "collection";
             } catch (Exception e1) {
                 anchor = name;
-
             }
-            if (collections.containsKey(anchor)) {
-                JournalCollection pack = collections.get(anchor);
-                if (!eIssns.isEmpty())
-                    pack.addISSN(eIssns);
-                if (!pIssns.isEmpty())
-                    pack.addISSN(pIssns);
-                collections.replace(anchor, pack);
-            } else {
-                if (!pIssns.isEmpty() || !eIssns.isEmpty()) {
-                    JournalCollection pack = new JournalCollection().setYear(year);
-                    if (!eIssns.isEmpty())
-                        pack.setIssns(eIssns);
-                    if (!pIssns.isEmpty())
-                        pack.addISSN(pIssns);
-                    pack.setAnchor(anchor);
-                    collections.put(anchor, pack);
-                }
+            Journalcollection journalCollection;
+            if (collections.containsKey(anchor))
+                journalCollection = collections.get(anchor);
+            else {
+                journalCollection = new Journalcollection(anchor, year, type);
+                journalCollection.setType("ezb");
+                collections.put(anchor,journalCollection);
             }
-            journalTitles.addAll(buildJournalTitleList(eIssns, name, subject, anchor, zdbID, "electronic", issnsCollection));
-            journalTitles.addAll(buildJournalTitleList(pIssns, name, subject, anchor, zdbID, "print", issnsCollection));
+            Journal journal = new Journal(zdbID,journalCollection);
+            journal.setZdbid(zdbID).setEzbID(parts[0]).setSubject(subject).setActualName(name).setLink(parts[12]);
+            journalCollection.addJournal(journal);
+            journalTitles.addAll(buildJournalTitleList(journal, journalCollection, eIssns, name, "electronic", issnsCollection));
+            journalTitles.addAll(buildJournalTitleList(journal, journalCollection, pIssns, name,"print", issnsCollection));
+            journal.setJournaltitles(journalTitles);
         }
         inputStream.close();
-        saveJournalTitles(journalTitles);
-        saveJournals(journals);
-        saveJournalCollections(collections);
-
     }
 
-    private List<JournalTitle> buildJournalTitleList(String issns, String name, String subject, String anchor, String zdbID, String type, HashSet<String> issnsCollection) {
+    private List<Journaltitle> buildJournalTitleList(Journal journal, Journalcollection journalcollection, String issns, String name, String type, HashSet<String> issnsCollection) {
         List<String> issnList = new ArrayList<>();
-        List<JournalTitle> journalTitles = new ArrayList<>();
+        List<Journaltitle> journalTitles = new ArrayList<>();
         if (issns.contains(";"))
             issnList = Arrays.asList(issns.split(";"));
         else
             issnList.add(issns);
         for (String issn : issnList) {
             if (!issn.isEmpty() && !issnsCollection.contains(issn)) {
-                JournalTitle journalTitle = new JournalTitle();
-                journalTitle.setName(name).setIssn(issn).setSubject(subject).setType(type).setAnchor(anchor).setZDBID(zdbID);
+                Journaltitle journalTitle = new Journaltitle(issn, journal, type, name);
+                journalTitle.addJournalCollection(journalcollection);
                 journalTitles.add(journalTitle);
                 issnsCollection.add(issn);
             }
@@ -133,31 +118,24 @@ class EzbUpload {
         return journalTitles;
     }
 
-    private void saveJournalTitles(List<JournalTitle> journalTitles) throws IOException {
-        for (JournalTitle journalTitle : journalTitles) {
-            String json = mapper.writeValueAsString(journalTitle);
-            if (!json.isEmpty())
-                Tools.saveObject(json,resourcesUrl + "/journaltitle");
-        }
-
-    }
-
-    private void saveJournals(List<Journal> journals) throws IOException {
-        for (Journal journal : journals) {
-            String json = mapper.writeValueAsString(journal);
-            if (!json.isEmpty())
-                Tools.saveObject(json,resourcesUrl + "/journal");
-        }
-
-    }
-
-    private void saveJournalCollections(Hashtable<String,JournalCollection> journalCollections) throws IOException {
-        Enumeration<JournalCollection> enumeration = journalCollections.elements();
+    private void saveJournalCollections(Hashtable<String,Journalcollection> journalCollections) throws IOException {
+        Enumeration<Journalcollection> enumeration = journalCollections.elements();
         while (enumeration.hasMoreElements()) {
-            JournalCollection journalCollection = enumeration.nextElement();
-            String json = mapper.writeValueAsString(journalCollection);
-            if (!json.isEmpty())
-                Tools.saveObject(json,resourcesUrl + "/journalcollection");
+            Journalcollection journalCollection = enumeration.nextElement();
+            log.info("saving collection " + journalCollection.getAnchor());
+            URI journalCollectionURI = Tools.saveObject(journalCollection.clone().setJournals(null),resourcesUrl + "/journalcollection");
+            for (Journal journal : journalCollection.getJournals()) {
+                log.info("saving journal " + journal.getEzbid());
+                URI journalURI = Tools.saveObject(journal.clone().setJournaltitles(null), resourcesUrl + "/journal");
+                log.info("connecting journal " + journalURI.toString() + " to collection " + journalCollectionURI.toString());
+                Tools.connect(journalURI,journalCollectionURI,"journalcollection");
+                for (Journaltitle journaltitle : journal.getJournaltitles()) {
+                    log.info("saving journal title " + journaltitle.getIssn());
+                    URI journaltitleURI = Tools.saveObject(journaltitle, resourcesUrl + "/journaltitle");
+                    log.info("connecting journal title " + journaltitleURI.toString() + " to jorunal " + journalURI.toString());
+                    Tools.connect(journaltitleURI,journalURI,"journal");
+                }
+            }
         }
     }
 }

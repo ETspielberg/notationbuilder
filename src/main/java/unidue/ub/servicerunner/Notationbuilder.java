@@ -81,7 +81,7 @@ public class Notationbuilder {
     }
 
     private List<String> listFiles() {
-        File xmlDirectory = new File(dataDir+ "/notations");
+        File xmlDirectory = new File(dataDir);
         FilenameFilter filter = (dir, name) -> {
             String lowercaseName = name.toLowerCase();
             return lowercaseName.startsWith("systematik-");
