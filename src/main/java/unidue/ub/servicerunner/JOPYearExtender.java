@@ -7,42 +7,39 @@ import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.client.Traverson;
 import org.xml.sax.SAXException;
 import unidue.ub.media.analysis.Journaldata;
 import unidue.ub.media.journals.Journal;
 import unidue.ub.media.journals.Journaltitle;
 import unidue.ub.media.tools.JournalTools;
-import org.springframework.hateoas.client.Traverson;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 class JOPYearExtender {
-
-    private String resourcesUrl;
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private List<Journaldata> journalsdata;
 
-    private String dataUrl;
-
-    JOPYearExtender(String dataUrl, String resourcesUrl) {
-        this.dataUrl = dataUrl;
-        this.resourcesUrl = resourcesUrl;
+    JOPYearExtender() {
     }
 
     void run() throws URISyntaxException, TransformerException, IOException, JDOMException, SAXException {
-        Traverson traverson = new Traverson(new URI(resourcesUrl + "/journal"), MediaTypes.HAL_JSON);
+        Traverson traverson = new Traverson(new URI("/api/resources/journal"), MediaTypes.HAL_JSON);
         Traverson.TraversalBuilder tb = traverson.follow("$._links.self.href");
-        ParameterizedTypeReference<Resources<Journal>> typeRefDevices = new ParameterizedTypeReference<Resources<Journal>>() {};
+        ParameterizedTypeReference<Resources<Journal>> typeRefDevices = new ParameterizedTypeReference<Resources<Journal>>() {
+        };
         Resources<Journal> journalsResources = tb.toObject(typeRefDevices);
         List<Journal> journals = new ArrayList(journalsResources.getContent());
         journalsdata = new ArrayList<>();
@@ -76,7 +73,7 @@ class JOPYearExtender {
 
     private void saveJournaldata() throws IOException {
         for (Journaldata journaldata : journalsdata) {
-            URI journalDataURI = Tools.saveObject(journaldata, dataUrl + "/journaldata");
+            URI journalDataURI = Tools.saveObject(journaldata, "/api/data/journaldata");
         }
     }
 

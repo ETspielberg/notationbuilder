@@ -21,13 +21,10 @@ public class Notationbuilder {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private String dataUrl;
-
     private String dataDir;
 
-    Notationbuilder(String dataDir, String dataUrl) {
+    Notationbuilder(String dataDir) {
         this.dataDir = dataDir;
-        this.dataUrl = dataUrl;
     }
 
     void run() {
@@ -41,7 +38,7 @@ public class Notationbuilder {
                 Notationgroup notationsPerSubject = new Notationgroup();
                 notationsPerSubject.setNotationgroupName(current.getAttributeValue("zahl"));
                 notationsPerSubject.setType("main");
-                setValuesForNotationgroup(current,notationsPerSubject);
+                setValuesForNotationgroup(current, notationsPerSubject);
                 notationgroups.add(notationsPerSubject);
                 Iterator<Element> descendants = current.getDescendants(new ElementFilter());
                 while (descendants.hasNext()) {
@@ -52,7 +49,7 @@ public class Notationbuilder {
                         Notationgroup notationsPerGroup = new Notationgroup();
                         notationsPerGroup.setType("group");
                         notationsPerGroup.setNotationgroupName(descendant.getAttributeValue("von") + " - " + descendant.getAttributeValue("bis"));
-                        setValuesForNotationgroup(descendant,notationsPerGroup);
+                        setValuesForNotationgroup(descendant, notationsPerGroup);
                         notationgroups.add(notationsPerGroup);
                     }
                 }
@@ -97,7 +94,7 @@ public class Notationbuilder {
         for (Notation notation : notations) {
             String json = mapper.writeValueAsString(notation);
             if (!json.isEmpty())
-                Tools.saveObject(json,dataUrl + "/notation");
+                Tools.saveObject(json, "/api/settings/notation");
         }
 
     }
@@ -106,7 +103,7 @@ public class Notationbuilder {
         for (Notationgroup notationgroup : notationgroups) {
             String json = mapper.writeValueAsString(notationgroup);
             if (!json.isEmpty())
-                Tools.saveObject(json,dataUrl + "/notationgroup");
+                Tools.saveObject(json, "/api/settings/notationgroup");
         }
     }
 }

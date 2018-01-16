@@ -17,7 +17,7 @@ public class Tools {
     static URI saveObject(Object object, String url) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<Object> request = new HttpEntity<>(object);
-        URI location = restTemplate.postForLocation(url,request,Object.class);
+        URI location = restTemplate.postForLocation(url, request, Object.class);
         return location;
     }
 
@@ -25,11 +25,11 @@ public class Tools {
         RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new org.springframework.http.MediaType("text","uri-list"));
-        HttpEntity<String> request = new HttpEntity<>(parent.toString(),headers);
+        headers.setContentType(new org.springframework.http.MediaType("text", "uri-list"));
+        HttpEntity<String> request = new HttpEntity<>(parent.toString(), headers);
         String url = child.toString() + "/" + type;
         log.info("sending put request to " + url);
-        restTemplate.put(url,request);
+        restTemplate.put(url, request);
     }
 
 

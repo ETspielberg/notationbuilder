@@ -3,13 +3,10 @@ package unidue.ub.servicerunner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import unidue.ub.media.analysis.Journaldata;
+
 import java.net.URISyntaxException;
 
 public class PriceExtender {
-
-    private String dataUrl;
-
-    private String getterUrl;
 
     private int year;
 
@@ -17,9 +14,7 @@ public class PriceExtender {
 
     private String type;
 
-    PriceExtender(String dataUrl, String getterUrl) {
-        this.dataUrl = dataUrl;
-        this.getterUrl = getterUrl;
+    PriceExtender() {
     }
 
     public void setIdentifier(String identifier) {
@@ -36,24 +31,24 @@ public class PriceExtender {
 
     void run() throws URISyntaxException {
         ResponseEntity<Journaldata> response = new RestTemplate().getForEntity(
-                dataUrl + "/journaldata/" + identifier,
+                "/api/data/journaldata/" + identifier,
                 Journaldata.class);
         Journaldata journaldata;
         if (response.getStatusCodeValue() == 200)
-                     journaldata = response.getBody();
+            journaldata = response.getBody();
         else
-            journaldata = new Journaldata(identifier,year);
-            switch (type) {
-            case "journal" : {
+            journaldata = new Journaldata(identifier, year);
+        switch (type) {
+            case "journal": {
                 ResponseEntity<Journaldata> getterResponse = new RestTemplate().getForEntity(
-                        getterUrl + "/journaldata/" + identifier,
+                        "/data/journaldata/" + identifier,
                         Journaldata.class);
 
             }
-            case "journaltitle" : {
+            case "journaltitle": {
 
             }
-            case "journalcollection" : {
+            case "journalcollection": {
 
             }
         }

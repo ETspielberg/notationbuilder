@@ -15,19 +15,13 @@ import java.util.regex.Pattern;
 
 class EzbAnalyzer {
 
-    private String resourcesUrl;
-
-    private String dataDir;
-
-    private Hashtable<String,Journalcollection> collections;
-
     private static final Pattern yearPattern = Pattern.compile("((19|20)\\d\\d)");
-
+    private String dataDir;
+    private Hashtable<String, Journalcollection> collections;
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    EzbAnalyzer(String dataDir, String resourcesUrl) {
+    EzbAnalyzer(String dataDir) {
         this.dataDir = dataDir;
-        this.resourcesUrl = resourcesUrl;
     }
 
     void run(String filename) throws IOException {
@@ -45,7 +39,7 @@ class EzbAnalyzer {
         return new FileInputStream(file);
     }
 
-    private void readCsv(InputStream csvFile, int year) throws IOException {
+    private void readCsv(InputStream csvFile, int year) {
         HashSet<String> issnsCollection = new HashSet<>();
         Scanner inputStream = new Scanner(new InputStreamReader(csvFile));
         collections = new Hashtable<>();
@@ -88,13 +82,13 @@ class EzbAnalyzer {
             else {
                 journalCollection = new Journalcollection(anchor, year, type);
                 journalCollection.setType("ezb");
-                collections.put(anchor,journalCollection);
+                collections.put(anchor, journalCollection);
             }
-            Journal journal = new Journal(zdbID,journalCollection);
+            Journal journal = new Journal(zdbID, journalCollection);
             journal.setZdbid(zdbID).setEzbID(parts[0]).setSubject(subject).setActualName(name).setLink(parts[12]);
             journalCollection.addJournal(journal);
             journalTitles.addAll(buildJournalTitleList(journal, journalCollection, eIssns, name, "electronic", issnsCollection));
-            journalTitles.addAll(buildJournalTitleList(journal, journalCollection, pIssns, name,"print", issnsCollection));
+            journalTitles.addAll(buildJournalTitleList(journal, journalCollection, pIssns, name, "print", issnsCollection));
             journal.setJournaltitles(journalTitles);
         }
         inputStream.close();
@@ -118,22 +112,22 @@ class EzbAnalyzer {
         return journalTitles;
     }
 
-    private void saveJournalCollections(Hashtable<String,Journalcollection> journalCollections) throws IOException {
+    private void saveJournalCollections(Hashtable<String, Journalcollection> journalCollections) throws IOException {
         Enumeration<Journalcollection> enumeration = journalCollections.elements();
         while (enumeration.hasMoreElements()) {
             Journalcollection journalCollection = enumeration.nextElement();
             log.info("saving collection " + journalCollection.getAnchor());
-            URI journalCollectionURI = Tools.saveObject(journalCollection.clone().setJournals(null),resourcesUrl + "/journalcollection");
+            URI journalCollectionURI = Tools.saveObject(journalCollection.clone().setJournals(null), "/api/resources/journalcollection");
             for (Journal journal : journalCollection.getJournals()) {
                 log.info("saving journal " + journal.getEzbid());
-                URI journalURI = Tools.saveObject(journal.clone().setJournaltitles(null), resourcesUrl + "/journal");
+                URI journalURI = Tools.saveObject(journal.clone().setJournaltitles(null), "/api/resources/journal");
                 log.info("connecting journal " + journalURI.toString() + " to collection " + journalCollectionURI.toString());
-                Tools.connect(journalURI,journalCollectionURI,"journalcollection");
+                Tools.connect(journalURI, journalCollectionURI, "journalcollection");
                 for (Journaltitle journaltitle : journal.getJournaltitles()) {
                     log.info("saving journal title " + journaltitle.getIssn());
-                    URI journaltitleURI = Tools.saveObject(journaltitle, resourcesUrl + "/journaltitle");
+                    URI journaltitleURI = Tools.saveObject(journaltitle, "/api/resources/journaltitle");
                     log.info("connecting journal title " + journaltitleURI.toString() + " to jorunal " + journalURI.toString());
-                    Tools.connect(journaltitleURI,journalURI,"journal");
+                    Tools.connect(journaltitleURI, journalURI, "journal");
                 }
             }
         }
