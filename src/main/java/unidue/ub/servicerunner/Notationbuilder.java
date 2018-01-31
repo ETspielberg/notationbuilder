@@ -6,6 +6,8 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.input.SAXBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unidue.ub.settings.fachref.Notation;
 import unidue.ub.settings.fachref.Notationgroup;
 
@@ -23,6 +25,8 @@ public class Notationbuilder {
 
     private String dataDir;
 
+    private final Logger log = LoggerFactory.getLogger(Notationbuilder.class);
+
     Notationbuilder(String dataDir) {
         this.dataDir = dataDir;
     }
@@ -33,6 +37,7 @@ public class Notationbuilder {
         List<Notationgroup> notationgroups = new ArrayList<>();
 
         for (String filename : filenames) {
+            log.info("reading file " + filename);
             try {
                 Element current = loadFile(filename);
                 Notationgroup notationsPerSubject = new Notationgroup();
@@ -58,6 +63,7 @@ public class Notationbuilder {
             }
         }
         try {
+            log.info("saving "  + notations.size() + " nbotations and " + notationgroups.size() + " notation groups");
             saveNotations(notations);
             saveNotationgroups(notationgroups);
         } catch (IOException e) {

@@ -14,9 +14,10 @@ public class Tools {
 
     private static Logger log = LoggerFactory.getLogger(Tools.class);
 
-    static URI saveObject(Object object, String url) throws IOException {
+    static URI saveObject(Object object, String url) {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<Object> request = new HttpEntity<>(object);
+        log.info("saving object " + object + " to url " + url);
         URI location = restTemplate.postForLocation(url, request, Object.class);
         return location;
     }
