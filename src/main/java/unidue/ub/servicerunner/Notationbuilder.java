@@ -64,8 +64,9 @@ public class Notationbuilder {
         }
         try {
             log.info("saving "  + notations.size() + " nbotations and " + notationgroups.size() + " notation groups");
-            saveNotations(notations);
-            saveNotationgroups(notationgroups);
+            DataWriter writer = new DataWriter();
+            writer.write(notations);
+            writer.write(notationgroups);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,23 +94,6 @@ public class Notationbuilder {
             return Arrays.asList(xmlDirectory.list(filter));
         } catch (Exception e) {
             return null;
-        }
-    }
-
-    private void saveNotations(List<Notation> notations) throws IOException {
-        for (Notation notation : notations) {
-            String json = mapper.writeValueAsString(notation);
-            if (!json.isEmpty())
-                Tools.saveObject(json, "http://localhost:8082/api/settings/notation");
-        }
-
-    }
-
-    private void saveNotationgroups(List<Notationgroup> notationgroups) throws IOException {
-        for (Notationgroup notationgroup : notationgroups) {
-            String json = mapper.writeValueAsString(notationgroup);
-            if (!json.isEmpty())
-                Tools.saveObject(json, "http://localhost:8082/api/settings/notationgroup");
         }
     }
 }
