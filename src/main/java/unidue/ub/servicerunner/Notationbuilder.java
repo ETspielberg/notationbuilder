@@ -94,7 +94,7 @@ public class Notationbuilder {
         for (Notation notation : notations) {
             String json = mapper.writeValueAsString(notation);
             if (!json.isEmpty())
-                Tools.saveObject(json, "/api/settings/notation");
+                Tools.saveObject(json, "http://localhost:8082/api/settings/notation");
         }
 
     }
@@ -103,7 +103,7 @@ public class Notationbuilder {
         for (Notationgroup notationgroup : notationgroups) {
             String json = mapper.writeValueAsString(notationgroup);
             if (!json.isEmpty())
-                Tools.saveObject(json, "/api/settings/notationgroup");
+                Tools.saveObject(json, "http://localhost:8082/api/settings/notationgroup");
         }
     }
 }
