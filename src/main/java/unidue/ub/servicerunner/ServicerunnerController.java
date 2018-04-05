@@ -30,19 +30,19 @@ public class ServicerunnerController {
     }
 
     @RequestMapping("/ezbAnalyzer")
-    public void runEzbUpload(String filename) throws IOException {
+    public void runEzbUpload(String filename) {
         log.info("running ezb analyzer with filename " + filename);
         EzbAnalyzer ezbAnalyzer = new EzbAnalyzer(dataDir);
         ezbAnalyzer.run(filename);
     }
 
     @RequestMapping("/extendyears")
-    public void extendYears() throws JDOMException, IOException, TransformerException, SAXException, URISyntaxException {
+    public void extendYears() {
         new JOPYearExtender().run();
     }
 
     @RequestMapping("/extendprices")
-    public void extendPrices() throws URISyntaxException {
+    public void extendPrices() {
         new PriceExtender().run();
     }
 }

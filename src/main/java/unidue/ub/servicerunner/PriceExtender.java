@@ -29,7 +29,7 @@ public class PriceExtender {
         this.year = year;
     }
 
-    void run() throws URISyntaxException {
+    void run() {
         ResponseEntity<Journaldata> response = new RestTemplate().getForEntity(
                 "/api/data/journaldata/" + identifier,
                 Journaldata.class);

@@ -16,22 +16,29 @@ import java.util.regex.Pattern;
 class EzbAnalyzer {
 
     private static final Pattern yearPattern = Pattern.compile("((19|20)\\d\\d)");
+
     private String dataDir;
+
     private Hashtable<String, Journalcollection> collections;
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+
+    private Logger log = LoggerFactory.getLogger(EzbAnalyzer.class);
 
     EzbAnalyzer(String dataDir) {
         this.dataDir = dataDir;
     }
 
-    void run(String filename) throws IOException {
+    void run(String filename) {
         int year = LocalDate.now().getYear();
         Matcher matcher = yearPattern.matcher(filename);
         if (matcher.find())
             year = Integer.parseInt(matcher.group());
-        InputStream input = loadFile(filename);
-        readCsv(input, year);
-        saveJournalCollections(collections);
+        try {
+            InputStream input = loadFile(filename);
+            readCsv(input, year);
+            saveJournalCollections(collections);
+        } catch (IOException ioe) {
+            log.warn("error reading file " + filename);
+        }
     }
 
     private synchronized InputStream loadFile(String filename) throws FileNotFoundException {
@@ -112,21 +119,16 @@ class EzbAnalyzer {
         return journalTitles;
     }
 
-    private void saveJournalCollections(Hashtable<String, Journalcollection> journalCollections) throws IOException {
+    private void saveJournalCollections(Hashtable<String, Journalcollection> journalCollections) {
         Enumeration<Journalcollection> enumeration = journalCollections.elements();
         while (enumeration.hasMoreElements()) {
             Journalcollection journalCollection = enumeration.nextElement();
-            log.info("saving collection " + journalCollection.getAnchor());
             URI journalCollectionURI = Tools.saveObject(journalCollection.clone().setJournals(null), "/api/resources/journalcollection");
             for (Journal journal : journalCollection.getJournals()) {
-                log.info("saving journal " + journal.getEzbid());
                 URI journalURI = Tools.saveObject(journal.clone().setJournaltitles(null), "/api/resources/journal");
-                log.info("connecting journal " + journalURI.toString() + " to collection " + journalCollectionURI.toString());
                 Tools.connect(journalURI, journalCollectionURI, "journalcollection");
                 for (Journaltitle journaltitle : journal.getJournaltitles()) {
-                    log.info("saving journal title " + journaltitle.getIssn());
                     URI journaltitleURI = Tools.saveObject(journaltitle, "/api/resources/journaltitle");
-                    log.info("connecting journal title " + journaltitleURI.toString() + " to jorunal " + journalURI.toString());
                     Tools.connect(journaltitleURI, journalURI, "journal");
                 }
             }
