@@ -19,16 +19,16 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class Notationbuilder {
-
+public class RvkoImporter {
     /*
+
     private ObjectMapper mapper = new ObjectMapper();
 
     private String dataDir;
 
-    private final Logger log = LoggerFactory.getLogger(Notationbuilder.class);
+    private final Logger log = LoggerFactory.getLogger(RvkoImporter.class);
 
-    Notationbuilder(String dataDir) {
+    RvkoImporter(String dataDir) {
         this.dataDir = dataDir;
     }
 
@@ -42,7 +42,7 @@ public class Notationbuilder {
             try {
                 Element current = loadFile(filename);
                 Notationgroup notationsPerSubject = new Notationgroup();
-                notationsPerSubject.setNotationgroupName(current.getAttributeValue("zahl"));
+                notationsPerSubject.setNotationgroupName(current.getAttributeValue("notation"));
                 notationsPerSubject.setType("main");
                 setValuesForNotationgroup(current, notationsPerSubject);
                 notationgroups.add(notationsPerSubject);
@@ -74,7 +74,7 @@ public class Notationbuilder {
     }
 
     private void setValuesForNotationgroup(Element node, Notationgroup notationgroup) {
-        notationgroup.setDescription(node.getChildText("bez"));
+        notationgroup.setDescription(node.getChildText("bennenung"));
         notationgroup.setNotationsStart(node.getAttributeValue("von"));
         notationgroup.setNotationsEnd(node.getAttributeValue("bis"));
     }
