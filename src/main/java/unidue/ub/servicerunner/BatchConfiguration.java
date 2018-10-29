@@ -7,14 +7,21 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
-import unidue.ub.servicerunner.model.*;
+import unidue.ub.servicerunner.model.systematic.*;
+import unidue.ub.settings.fachref.*;
 
 @Configuration
 public class BatchConfiguration extends RepositoryRestConfigurerAdapter {
+
+    @Override
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+        config.exposeIdsFor(UserCategory.class,UserGroup.class,ItemCategory.class,ItemGroup.class);
+    }
 
     @Bean
     public TaskExecutor taskExecutor() {

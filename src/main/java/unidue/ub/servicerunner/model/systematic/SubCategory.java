@@ -1,4 +1,4 @@
-package unidue.ub.servicerunner.model;
+package unidue.ub.servicerunner.model.systematic;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -6,8 +6,9 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
+import java.util.Set;
 
 @XmlRootElement(name="subCategory")
 @NodeEntity
@@ -21,21 +22,25 @@ public class SubCategory {
 
     private String reference;
 
-    @Relationship(type = "HAS_COMMENTS", direction = Relationship.DIRECTION)
+    @Relationship(type = "HAS_COMMENTS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "comment")
-    private List<Comment> comments;
+    @XmlElementWrapper(name = "comments")
+    private Set<Comment> comments;
 
-    @Relationship(type = "HAS_DESCRIPTIONS", direction = Relationship.DIRECTION)
+    @Relationship(type = "HAS_DESCRIPTIONS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "description")
-    private List<Description> descriptions;
+    @XmlElementWrapper(name = "descriptions")
+    private Set<Description> descriptions;
 
-    @Relationship(type = "HAS_SUB_CATEGORIES", direction = Relationship.DIRECTION)
+    @Relationship(type = "HAS_SUB_CATEGORIES", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "subCategory")
-    private List<SubCategory> subCategorys;
+    @XmlElementWrapper(name = "subCategorys")
+    private Set<SubCategory> subCategorys;
 
-    @Relationship(type = "HAS_CLASSIFICATIONS", direction = Relationship.DIRECTION)
+    @Relationship(type = "HAS_CLASSIFICATIONS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "classification")
-    private List<Classification> classifications;
+    @XmlElementWrapper(name = "classifications")
+    private Set<Classification> classifications;
 
     public SubCategory() {}
 
@@ -63,25 +68,25 @@ public class SubCategory {
         this.reference = reference;
     }
 
-    public void setComments(List<Comment> comments) {
+    public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
 
     public void hasComment(Comment comment) {this.comments.add(comment);}
 
-    public void setSubCategorys(List<SubCategory> subCategorys) {
+    public void setSubCategorys(Set<SubCategory> subCategorys) {
         this.subCategorys = subCategorys;
     }
 
     public void hasSubCategory(SubCategory subCategory) { this.subCategorys.add(subCategory);}
 
-    public void setDescriptions(List<Description> descriptions) {
+    public void setDescriptions(Set<Description> descriptions) {
         this.descriptions = descriptions;
     }
 
     public void hasDescription(Description description) { this.descriptions.add(description);}
 
-    public void setClassifications(List<Classification> classifications) {
+    public void setClassifications(Set<Classification> classifications) {
         this.classifications = classifications;
     }
 

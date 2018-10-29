@@ -16,12 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @CrossOrigin(origins = "http://localhost:4200")
-@RequestMapping("/run")
 public class ServicerunnerController {
 
     @Value("${ub.statistics.data.dir}")
@@ -33,22 +32,30 @@ public class ServicerunnerController {
     JobLauncher jobLauncher;
 
     @Autowired
-    Job systemaicBuilder;
+    Job ghbsysImporterJob;
+
+    @Autowired
+    Job journalJob;
 
     @RequestMapping("/systematicBuilder/{type}")
-    public ResponseEntity<Object> runNotationBuilder(String type) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+    public ResponseEntity<?> runNotationBuilder(@PathVariable String type) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         log.info("building notations");
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addString("systematic.type", type).addLong("time",System.currentTimeMillis()).toJobParameters();
         JobParameters jobParameters = jobParametersBuilder.toJobParameters();
-        jobLauncher.run(systemaicBuilder, jobParameters);
+        jobLauncher.run(ghbsysImporterJob, jobParameters);
         return ResponseEntity.status(HttpStatus.FOUND).build();
     }
 
     @RequestMapping("/ezbAnalyzer")
-    public void runEzbUpload(String filename) {
+    public ResponseEntity<?> runEzbUpload(String filename, String year) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         log.info("running ezb analyzer with filename " + filename);
-        EzbAnalyzer ezbAnalyzer = new EzbAnalyzer(dataDir);
-        ezbAnalyzer.run(filename);
+        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+        jobParametersBuilder.addString("ezb.filename", filename)
+                .addString("ezb.year", year)
+                .addLong("time",System.currentTimeMillis()).toJobParameters();
+        JobParameters jobParameters = jobParametersBuilder.toJobParameters();
+        jobLauncher.run(journalJob, jobParameters);
+        return ResponseEntity.status(HttpStatus.FOUND).build();
     }
 }

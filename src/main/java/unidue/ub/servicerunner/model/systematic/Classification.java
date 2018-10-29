@@ -1,4 +1,4 @@
-package unidue.ub.servicerunner.model;
+package unidue.ub.servicerunner.model.systematic;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -6,6 +6,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
@@ -19,14 +20,16 @@ public class Classification {
 
     private String reference;
 
-    @Relationship(type = "HAS_DESCRIPTIONS", direction = Relationship.DIRECTION)
+    @Relationship(type = "HAS_DESCRIPTIONS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "description")
+    @XmlElementWrapper(name = "descriptions")
     private List<Description> descriptions;
 
     private String target;
 
-    @Relationship(type = "HAS_COMMENTS", direction = Relationship.DIRECTION)
+    @Relationship(type = "HAS_COMMENTS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "comment")
+    @XmlElementWrapper(name = "comments")
     private List<Comment> comments;
 
     public Classification() {}

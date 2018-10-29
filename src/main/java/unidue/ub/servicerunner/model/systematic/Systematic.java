@@ -1,4 +1,4 @@
-package unidue.ub.servicerunner.model;
+package unidue.ub.servicerunner.model.systematic;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -19,7 +19,7 @@ public class Systematic {
 
     private String type;
 
-    @Relationship(type = "HAS_SUBJECT_AREAS", direction = Relationship.DIRECTION)
+    @Relationship(type = "HAS_SUBJECT_AREAS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "subjectAreas")
     private List<SubjectArea> subjectAreas;
 

@@ -1,4 +1,4 @@
-package unidue.ub.servicerunner.model;
+package unidue.ub.servicerunner.model.systematic;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;

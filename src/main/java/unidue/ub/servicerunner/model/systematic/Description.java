@@ -1,4 +1,4 @@
-package unidue.ub.servicerunner.model;
+package unidue.ub.servicerunner.model.systematic;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -6,6 +6,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import java.util.Set;
 
 @NodeEntity
 @XmlRootElement(name="description")
@@ -17,9 +18,9 @@ public class Description {
 
     private String target;
 
-    private String description;
+    private String text;
 
-    private List<String> keywords;
+    private Set<String> keywords;
 
     public Description() { }
 
@@ -39,15 +40,19 @@ public class Description {
         this.target = target;
     }
 
-    public String getDescription() {
-        return description;
+    public String getText() {
+        return text;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public void setKeywords(List<String> keywords) {
+    public Set<String> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(Set<String> keywords) {
         this.keywords = keywords;
     }
 

@@ -1,15 +1,12 @@
-package unidue.ub.servicerunner.model;
+package unidue.ub.servicerunner.model.systematic;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
+import javax.xml.bind.annotation.*;
+import java.util.Set;
 
 @NodeEntity
 @XmlRootElement(name="subjectArea")
@@ -24,27 +21,31 @@ public class SubjectArea {
 
     @Relationship(type = "HAS_DESCRIPTIONS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "description")
-    private List<Description> descriptions;
+    @XmlElementWrapper(name = "descriptions")
+    private Set<Description> descriptions;
 
     @Relationship(type = "HAS_COMMENTS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "comment")
-    private List<Comment> comments;
+    @XmlElementWrapper(name = "comments")
+    private Set<Comment> comments;
 
     @Relationship(type = "HAS_SUB_CATEGORIES", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "subCategory")
-    private List<SubCategory> subCategorys;
+    @XmlElementWrapper(name = "subCategorys")
+    private Set<SubCategory> subCategorys;
 
     @Relationship(type = "HAS_CLASSIFICATIONS", direction = Relationship.UNDIRECTED)
     @XmlElement(name = "classification")
-    private List<Classification> classifications;
+    @XmlElementWrapper(name = "classifications")
+    private Set<Classification> classifications;
 
     public SubjectArea() { }
 
-    public List<Description> getDescriptions() {
+    public Set<Description> getDescriptions() {
         return descriptions;
     }
 
-    public void setDescriptions(List<Description> descriptions) {
+    public void setDescriptions(Set<Description> descriptions) {
         this.descriptions = descriptions;
     }
 
@@ -66,31 +67,31 @@ public class SubjectArea {
         this.id = id;
     }
 
-    public List<Comment> getComments() {
+    public Set<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(List<Comment> comments) {
+    public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
 
     public void hasComment(Comment comment) { this.comments.add(comment);}
 
-    public List<SubCategory> getSubCategorys() {
+    public Set<SubCategory> getSubCategorys() {
         return subCategorys;
     }
 
-    public void setSubCategorys(List<SubCategory> subCategorys) {
+    public void setSubCategorys(Set<SubCategory> subCategorys) {
         this.subCategorys = subCategorys;
     }
 
     public void hasSubCategorys(SubCategory subCategory) {this.subCategorys.add(subCategory);}
 
-    public List<Classification> getClassifications() {
+    public Set<Classification> getClassifications() {
         return classifications;
     }
 
-    public void setClassifications(List<Classification> classifications) {
+    public void setClassifications(Set<Classification> classifications) {
         this.classifications = classifications;
     }
 

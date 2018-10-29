@@ -48,7 +48,7 @@
     </xsl:template>
 
     <xsl:template name="subCategorys">
-        <subcategorys>
+        <subCategorys>
             <xsl:for-each select="gruppe">
                 <subCategory>
                     <reference>
@@ -61,7 +61,7 @@
                     <xsl:call-template name="classifications"/>
                 </subCategory>
             </xsl:for-each>
-        </subcategorys>
+        </subCategorys>
     </xsl:template>
 
 

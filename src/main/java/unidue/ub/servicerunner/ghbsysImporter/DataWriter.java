@@ -7,9 +7,9 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import unidue.ub.servicerunner.model.SubjectArea;
-import unidue.ub.servicerunner.model.Systematic;
-import unidue.ub.servicerunner.repository.SystematicRepository;
+import unidue.ub.servicerunner.model.systematic.SubjectArea;
+import unidue.ub.servicerunner.model.systematic.Systematic;
+import unidue.ub.servicerunner.repository.systematic.SystematicRepository;
 
 import java.util.List;
 
