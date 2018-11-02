@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Component;
-import unidue.ub.servicerunner.model.journalHoldings.Journal;
-import unidue.ub.servicerunner.model.journalHoldings.Journaltitle;
+import unidue.ub.servicerunner.model.journals.Journal;
+import unidue.ub.servicerunner.model.journals.Journaltitle;
 
 import java.util.*;
 
@@ -17,9 +17,6 @@ public class JournalProcessor implements ItemProcessor<String, Journal> {
 
     @Value("${ub.statistics.data.dir}")
     private String dataDir;
-
-    @Value("#{jobParameters['systematic.type'] ?: 'ghbsys'}")
-    public String systematicType;
 
     @Autowired
     Jaxb2Marshaller jaxb2Marshaller;
@@ -54,14 +51,21 @@ public class JournalProcessor implements ItemProcessor<String, Journal> {
             anchor = name;
         }
         Journal journal = new Journal(zdbID, anchor);
-        journal.setZdbid(zdbID).setEzbID(parts[0]).setSubject(subject).setActualName(name).setLink(parts[12]).setActualName(anchor);
-        journaltitles.addAll(buildJournalTitleList(journal, eIssns, name, "electronic", issnsCollection));
-        journaltitles.addAll(buildJournalTitleList(journal, pIssns, name, "print", issnsCollection));
+        journal.setZdbid(zdbID).setEzbID(parts[0]).setSubject(subject).setName(name).setLink(parts[12]);
+        journaltitles.addAll(buildJournalTitleList(eIssns, name, "electronic", issnsCollection));
+        journaltitles.addAll(buildJournalTitleList(pIssns, name, "print", issnsCollection));
         journal.setJournaltitles(new HashSet<>(journaltitles));
+        if (journal.getJournaltitles().size() > 1) {
+            for (Journaltitle first : journal.getJournaltitles()) {
+                for (Journaltitle other : journal.getJournaltitles())
+                    if (!first.equals(other))
+                        first.isSameJournalAs(other);
+            }
+        }
         return journal;
     }
 
-    private List<Journaltitle> buildJournalTitleList(Journal journal, String issns, String name, String type, HashSet<String> issnsCollection) {
+    private List<Journaltitle> buildJournalTitleList(String issns, String name, String type, HashSet<String> issnsCollection) {
         List<String> issnList = new ArrayList<>();
         List<Journaltitle> journalTitles = new ArrayList<>();
         if (issns.contains(";"))
@@ -70,7 +74,7 @@ public class JournalProcessor implements ItemProcessor<String, Journal> {
             issnList.add(issns);
         for (String issn : issnList) {
             if (!issn.isEmpty() && !issnsCollection.contains(issn)) {
-                Journaltitle journalTitle = new Journaltitle(issn, journal, type, name);
+                Journaltitle journalTitle = new Journaltitle(issn, type, name);
                 journalTitles.add(journalTitle);
                 issnsCollection.add(issn);
             }

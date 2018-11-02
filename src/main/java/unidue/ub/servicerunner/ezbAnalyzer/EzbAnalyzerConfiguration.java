@@ -13,13 +13,13 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import unidue.ub.servicerunner.model.journalHoldings.Journal;
+import unidue.ub.servicerunner.model.journals.Journal;
 
 @Configuration
 @EnableBatchProcessing
 public class EzbAnalyzerConfiguration {
 
-    private final JobBuilderFactory jobBuilderFactory;
+    private JobBuilderFactory jobBuilderFactory;
 
     private StepBuilderFactory stepBuilderFactory;
 
@@ -48,8 +48,8 @@ public class EzbAnalyzerConfiguration {
     }
 
     @Bean
-    public Step step() {
-        return stepBuilderFactory.get("ezbAnalyzerStep")
+    public Step journalStep() {
+        return stepBuilderFactory.get("journalStep")
                 .<String, Journal>chunk(100)
                 .reader(journalFileReader())
                 .processor(journalFileProcessor())
@@ -61,7 +61,7 @@ public class EzbAnalyzerConfiguration {
     public Job journalJob(JobExecutionListener listener) {
         FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("journalFlow");
         Flow flow = flowBuilder
-                .start(step())
+                .start(journalStep())
                 .end();
         return jobBuilderFactory.get("journalJob")
                 .incrementer(new RunIdIncrementer())

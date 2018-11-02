@@ -20,11 +20,15 @@ import unidue.ub.servicerunner.model.systematic.SubjectArea;
 @EnableBatchProcessing
 public class GhbsysImporterConfiguration {
 
-    @Autowired
-    public JobBuilderFactory jobBuilderFactory;
+    private final JobBuilderFactory jobBuilderFactory;
+
+    private final StepBuilderFactory stepBuilderFactory;
 
     @Autowired
-    public StepBuilderFactory stepBuilderFactory;
+    public GhbsysImporterConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
+        this.jobBuilderFactory = jobBuilderFactory;
+        this.stepBuilderFactory = stepBuilderFactory;
+    }
 
     @Bean
     @StepScope

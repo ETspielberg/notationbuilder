@@ -1,7 +1,9 @@
 package unidue.ub.servicerunner.ezbAnalyzer;
 
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
+@Component
+@StepScope
 public class JournalFileReader implements ItemReader<String> {
 
 

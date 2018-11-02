@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import unidue.ub.servicerunner.model.systematic.SubjectArea;
 import unidue.ub.servicerunner.model.systematic.Systematic;
-import unidue.ub.servicerunner.repository.systematic.SystematicRepository;
+import unidue.ub.servicerunner.repository.graph.SystematicRepository;
 
 import java.util.List;
 

@@ -1,20 +1,15 @@
 package unidue.ub.servicerunner.ghbsysImporter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class FileReader implements ItemReader<String> {
-
-    private Logger log = LoggerFactory.getLogger(FileReader.class);
 
     private List<String> filenames;
 
@@ -25,11 +20,13 @@ public class FileReader implements ItemReader<String> {
 
     @Override
     public String read() {
-        if (!isRead) {
+        if (!isRead)
             filenames = listFiles();
-            log.info(String.valueOf(filenames.size()));
-        } if (!filenames.isEmpty()) {
-            log.info(filenames.get(0));
+
+        if (filenames == null)
+            return null;
+
+        if (!filenames.isEmpty()) {
             return filenames.remove(0);
         }
         return null;
@@ -43,7 +40,7 @@ public class FileReader implements ItemReader<String> {
         };
         isRead = true;
         try {
-            return new LinkedList<String>(Arrays.asList(xmlDirectory.list(filter)));
+            return new LinkedList<>(Arrays.asList(xmlDirectory.list(filter)));
         } catch (Exception e) {
             return null;
         }
