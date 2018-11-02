@@ -11,8 +11,8 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @SpringBootApplication
 @EnableEurekaClient
-@EnableNeo4jRepositories
-@EntityScan("unidue.ub.settings.fachref")
+@EnableNeo4jRepositories("unidue.ub.servicerunner.repository.graph")
+@EntityScan("unidue.ub.servicerunner.model")
 public class ServicerunnerApplication extends WebSecurityConfigurerAdapter {
 
     public static void main(String[] args) {

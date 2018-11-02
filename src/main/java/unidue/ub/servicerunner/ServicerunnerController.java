@@ -28,34 +28,48 @@ public class ServicerunnerController {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    JobLauncher jobLauncher;
+    private final JobLauncher jobLauncher;
+
+    private final Job ghbsysImporterJob;
+
+    private final Job journalJob;
 
     @Autowired
-    Job ghbsysImporterJob;
-
-    @Autowired
-    Job journalJob;
+    public ServicerunnerController(JobLauncher jobLauncher, Job ghbsysImporterJob, Job journalJob) {
+        this.jobLauncher = jobLauncher;
+        this.ghbsysImporterJob = ghbsysImporterJob;
+        this.journalJob = journalJob;
+    }
 
     @RequestMapping("/systematicBuilder/{type}")
-    public ResponseEntity<?> runNotationBuilder(@PathVariable String type) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+    public ResponseEntity<?> runNotationBuilder(@PathVariable String type) {
         log.info("building notations");
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addString("systematic.type", type).addLong("time",System.currentTimeMillis()).toJobParameters();
         JobParameters jobParameters = jobParametersBuilder.toJobParameters();
-        jobLauncher.run(ghbsysImporterJob, jobParameters);
-        return ResponseEntity.status(HttpStatus.FOUND).build();
+        return runJobWithParameters(ghbsysImporterJob, jobParameters);
     }
 
     @RequestMapping("/ezbAnalyzer")
-    public ResponseEntity<?> runEzbUpload(String filename, String year) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+    public ResponseEntity<?> runEzbUpload(String filename, String year, String institution) {
         log.info("running ezb analyzer with filename " + filename);
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addString("ezb.filename", filename)
                 .addString("ezb.year", year)
+                .addString("ezb.institution", institution)
                 .addLong("time",System.currentTimeMillis()).toJobParameters();
         JobParameters jobParameters = jobParametersBuilder.toJobParameters();
-        jobLauncher.run(journalJob, jobParameters);
-        return ResponseEntity.status(HttpStatus.FOUND).build();
+        return runJobWithParameters(journalJob, jobParameters);
     }
+
+    private ResponseEntity<?> runJobWithParameters(Job job, JobParameters jobParameters) {
+        try {
+            jobLauncher.run(job, jobParameters);
+            return ResponseEntity.status(HttpStatus.FOUND).build();
+        } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException | JobParametersInvalidException | JobRestartException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
