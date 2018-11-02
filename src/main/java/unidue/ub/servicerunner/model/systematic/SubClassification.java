@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import java.util.Objects;
 
 @NodeEntity
 @XmlRootElement(name="subClassification")
@@ -67,4 +68,20 @@ public class SubClassification {
     }
 
     public void hasComment(Comment comment) { this.comments.add(comment);}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof SubClassification)) {
+            return false;
+        }
+        SubClassification subClassification = (SubClassification) o;
+        return Objects.equals(target, subClassification.target) &&
+                Objects.equals(reference, subClassification.reference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(target, reference);
+    }
 }

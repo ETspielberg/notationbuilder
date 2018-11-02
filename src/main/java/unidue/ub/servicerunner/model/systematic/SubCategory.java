@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Objects;
 import java.util.Set;
 
 @XmlRootElement(name="subCategory")
@@ -91,4 +92,21 @@ public class SubCategory {
     }
 
     public void hasClassification(Classification classification) {this.classifications.add(classification);}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof SubCategory)) {
+            return false;
+        }
+        SubCategory subCategory = (SubCategory) o;
+        return Objects.equals(target, subCategory.target) &&
+                Objects.equals(reference, subCategory.reference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(target, reference);
+    }
+
 }

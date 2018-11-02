@@ -1,4 +1,4 @@
-package unidue.ub.servicerunner.model.journalHoldings;
+package unidue.ub.servicerunner.model.journals;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -17,32 +17,34 @@ public class Journalcollection implements Cloneable, Comparable<Journalcollectio
 
 	private String identifier;
 	
-	private String description;
-	
-	private String anchor;
+	private String name;
 
 	private String type;
 	
 	private int year;
 
-	@Relationship(type = "HAS_DESCRIPTIONS", direction = Relationship.UNDIRECTED)
+	private Set<Order> orders;
+
+	private Set<Invoice> invoices;
+
+	@Relationship(type = "CONTAINS", direction = Relationship.UNDIRECTED)
 	private Set<Journal> journals;
 	
 	public Journalcollection(){
-		description = "";
-		anchor = "";
-		identifier = anchor + String.valueOf(year);
+		name = "";
+		identifier = name + String.valueOf(year);
 		year = LocalDate.now().getYear();
 		journals = new HashSet<>();
+		orders = new HashSet<>();
 	}
 
 	public Journalcollection(String anchor, int year, String type) {
-		this.anchor = anchor;
+		this.name = anchor;
 		this.year = year;
-		this.description = "";
 		this.type = type;
 		identifier = anchor + String.valueOf(year);
 		journals = new HashSet<>();
+		orders = new HashSet<>();
 	}
 
 	public Long getId() {
@@ -51,6 +53,14 @@ public class Journalcollection implements Cloneable, Comparable<Journalcollectio
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Set<Order> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(Set<Order> orders) {
+		this.orders = orders;
 	}
 
 	public String getIdentifier() {
@@ -94,32 +104,24 @@ public class Journalcollection implements Cloneable, Comparable<Journalcollectio
 		this.journals.add(journal);
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public String getAnchor() {
-		return anchor;
+	public String getName() {
+		return name;
 	}
 	
 	public int getYear() {
 		return year;
 	}
 
-	public Journalcollection setDescription(String description) {
-		this.description = description;
-		return this;
-	}
 
-	public Journalcollection setAnchor(String anchor) {
-		this.anchor = anchor;
-		identifier = anchor + String.valueOf(year);
+	public Journalcollection setName(String name) {
+		this.name = name;
+		identifier = name + String.valueOf(year);
 		return this;
 	}
 	
 	public Journalcollection setYear(int year) {
 		this.year = year;
-		identifier = anchor + String.valueOf(year);
+		identifier = name + String.valueOf(year);
 		return this;
 	}
 
@@ -138,7 +140,7 @@ public class Journalcollection implements Cloneable, Comparable<Journalcollectio
 	
 	public Journalcollection clone() {
 		Journalcollection clone = new Journalcollection();
-		clone.setAnchor(anchor).setDescription(description).setJournals(journals).setYear(year);
+		clone.setName(name).setJournals(journals).setYear(year);
 	    return clone;
 	}
 	
@@ -148,4 +150,22 @@ public class Journalcollection implements Cloneable, Comparable<Journalcollectio
         else
             return -1;
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) return true;
+		if (!(o instanceof Journalcollection)) {
+			return false;
+		}
+		Journalcollection journalcollection = (Journalcollection) o;
+		return year == journalcollection.year &&
+				Objects.equals(identifier, journalcollection.identifier) &&
+				Objects.equals(name, journalcollection.name) &&
+				Objects.equals(type, journalcollection.type);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, identifier, type, year);
+	}
 }

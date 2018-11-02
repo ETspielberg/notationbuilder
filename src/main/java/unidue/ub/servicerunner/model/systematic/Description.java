@@ -5,7 +5,6 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 import java.util.Set;
 
 @NodeEntity

@@ -1,4 +1,4 @@
-package unidue.ub.servicerunner.model.journalHoldings;
+package unidue.ub.servicerunner.model.journals;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -16,7 +16,7 @@ public class Journal implements Cloneable {
 
 	private String zdbid;
 	
-	private String actualName;
+	private String name;
 
 	private String ezbid;
 	
@@ -26,13 +26,13 @@ public class Journal implements Cloneable {
 	
 	private String publisher;
 
-	@Relationship(type = "HAS_DESCRIPTIONS", direction = Relationship.UNDIRECTED)
+	@Relationship(type = "CONTAINS", direction = Relationship.UNDIRECTED)
 	private Set<Journaltitle> journaltitles;
 
 	private String anchor;
 
 	public Journal() {
-		actualName = "";
+		name = "";
 		ezbid = "";
 		zdbid = "";
 		link = "";
@@ -44,7 +44,7 @@ public class Journal implements Cloneable {
 	public Journal(String zdbid, String anchor) {
 		this.zdbid = zdbid;
 		this.anchor = anchor;
-		actualName = "";
+		name = "";
 		ezbid = "";
 		link = "";
 		subject = "";
@@ -103,11 +103,7 @@ public class Journal implements Cloneable {
 		this.ezbid = ezbID;
 		return this;
 	}
-	
-	public Journal setActualName(String actualName) {
-		this.actualName = actualName;
-		return this;
-	}
+
 	
 	public Journal setPublisher(String publisher) {
 		this.publisher = publisher;
@@ -119,8 +115,13 @@ public class Journal implements Cloneable {
 		return this;
 	}
 
-	public String getActualName() {
-		return actualName;
+	public String getName() {
+		return name;
+	}
+
+	public Journal setName(String name) {
+		this.name = name;
+		return this;
 	}
 
 	public String getSubject() {
@@ -184,12 +185,32 @@ public class Journal implements Cloneable {
 
 	public Journal clone() {
 		Journal clone = new Journal(zdbid,anchor)
-				.setActualName(actualName)
+				.setName(name)
 				.setJournaltitles(journaltitles)
 				.setLink(link)
 				.setPublisher(publisher)
 				.setSubject(subject)
 				.setEzbID(ezbid);
 		return clone;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) return true;
+		if (!(o instanceof Journal)) {
+			return false;
+		}
+		Journal journal = (Journal) o;
+		return Objects.equals(zdbid, journal.zdbid) &&
+				Objects.equals(name, journal.name) &&
+				Objects.equals(link, journal.link) &&
+				Objects.equals(subject, journal.subject) &&
+				Objects.equals(publisher, journal.publisher) &&
+				Objects.equals(ezbid, journal.ezbid);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, link, subject, publisher, ezbid, zdbid);
 	}
 }

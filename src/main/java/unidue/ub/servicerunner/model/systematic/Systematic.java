@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import java.util.Objects;
 
 @NodeEntity
 @XmlRootElement(name="systematic")
@@ -46,4 +47,19 @@ public class Systematic {
     }
 
     public void hasSubjectArea(SubjectArea subjectArea) {this.subjectAreas.add(subjectArea);}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Systematic)) {
+            return false;
+        }
+        Systematic systematic = (Systematic) o;
+        return Objects.equals(type, systematic.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type);
+    }
 }

@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import java.util.Objects;
 
 @NodeEntity
 @XmlRootElement(name="classification")
@@ -68,5 +69,21 @@ public class Classification {
 
     public void setTarget(String target) {
         this.target = target;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Classification)) {
+            return false;
+        }
+        Classification classification = (Classification) o;
+        return Objects.equals(target, classification.target) &&
+                Objects.equals(reference, classification.reference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(target, reference);
     }
 }

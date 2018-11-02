@@ -6,6 +6,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.xml.bind.annotation.*;
+import java.util.Objects;
 import java.util.Set;
 
 @NodeEntity
@@ -96,4 +97,19 @@ public class SubjectArea {
     }
 
     public void hasClassification(Classification classification) {this.classifications.add(classification);}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof SubjectArea)) {
+            return false;
+        }
+        SubjectArea subjectArea = (SubjectArea) o;
+        return Objects.equals(reference, subjectArea.reference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(reference);
+    }
 }

@@ -1,8 +1,12 @@
-package unidue.ub.servicerunner.model.journalHoldings;
+package unidue.ub.servicerunner.model.journals;
 
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @NodeEntity
 public class Journaltitle implements Cloneable {
@@ -17,29 +21,26 @@ public class Journaltitle implements Cloneable {
 	
 	private String type;
 
-	private Journal journal;
+	private boolean isActive;
+
+	@Relationship(type = "IS_SAME_JOURNAL", direction = Relationship.UNDIRECTED)
+	private Set<Journaltitle> sameJournal;
 	
 	public Journaltitle() {
-		name = "";
-		issn = "";
-		type="electronic";
+		this.name = "";
+		this.issn = "";
+		this.type="electronic";
+		this.isActive = true;
+		this.sameJournal = new HashSet<>();
 	}
 
-	public Journaltitle(String issn, Journal journal, String type, String name) {
+	public Journaltitle(String issn, String type, String name) {
 		this.issn = issn;
-		this.journal = journal;
 		this.type = type;
 		this.name = name;
+		this.isActive = true;
+		this.sameJournal = new HashSet<>();
 	}
-
-	public void setJournal(Journal journal) {
-		this.journal = journal;
-	}
-
-	public Journal getJournal() {
-		return journal;
-	}
-
 	/**
 	 * returns the name of the journal title
 	 * @return the name
@@ -94,16 +95,52 @@ public class Journaltitle implements Cloneable {
 		return this;
 	}
 
-    /**
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean active) {
+		isActive = active;
+	}
+
+	/**
      * returns a new <code>Journaltitle</code> object as clone of an existing one
      * 
      * @return a clone of the original journal title
      */
     public Journaltitle clone() {
     	Journaltitle clone = new Journaltitle();
-    	clone.setIssn(issn).setName(name).setType(type);
+    	clone.setIssn(issn).setName(name).setType(type).setActive(isActive);
     	return clone;
     }
 
+    public void isSameJournalAs(Journaltitle journaltitle) {
+    	this.sameJournal.add(journaltitle);
+	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) return true;
+		if (!(o instanceof Journaltitle)) {
+			return false;
+		}
+		Journaltitle journaltitle = (Journaltitle) o;
+		return isActive == journaltitle.isActive &&
+				Objects.equals(issn, journaltitle.issn) &&
+				Objects.equals(name, journaltitle.name) &&
+				Objects.equals(type, journaltitle.type);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, issn, type, isActive);
+	}
 }
