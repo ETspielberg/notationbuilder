@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: admin-backend
+  cloud:
+    config:
+      uri: http://localhost:11811
+      name: settings-datasource authentication
+      username: ${config_username:dalek}
+      password: ${config_password:3l1m1nat3}
+      label: ${libintel.profile:dev}

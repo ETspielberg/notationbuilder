@@ -1,0 +1,15 @@
+server:
+  port: ${server_port:11844}
+
+spring:
+  batch:
+    job:
+      enabled: false
+    initialize-schema: always
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        ddl-auto: update
+        temp:
+          use_jdbc_metadata_defaults: false
